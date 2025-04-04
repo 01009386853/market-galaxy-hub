@@ -15,7 +15,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     : null;
     
   return (
-    <Link to={`/product/${product.id}`} className="product-card overflow-hidden flex flex-col h-full">
+    <Link to={`/product/${product.id}`} className="overflow-hidden flex flex-col h-full bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
       <div className="relative pb-[56.25%]">
         <img 
           src={product.thumbnail} 

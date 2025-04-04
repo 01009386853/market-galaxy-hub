@@ -5,6 +5,14 @@ import { getProducts, getProductsByCategory, categories } from '../services/prod
 import { Product } from '../contexts/CartContext';
 import ProductCard from '../components/ProductCard';
 import { Filter } from 'lucide-react';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -14,6 +22,8 @@ const Products = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 3000 });
   const [minRating, setMinRating] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 8;
   
   const location = useLocation();
   
@@ -21,6 +31,13 @@ const Products = () => {
     const searchParams = new URLSearchParams(location.search);
     const category = searchParams.get('category');
     const searchQuery = searchParams.get('search');
+    const pageParam = searchParams.get('page');
+    
+    if (pageParam) {
+      setCurrentPage(parseInt(pageParam));
+    } else {
+      setCurrentPage(1);
+    }
     
     const loadProducts = async () => {
       setIsLoading(true);
@@ -104,6 +121,17 @@ const Products = () => {
   const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen);
   };
+
+  // Get current products
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  // Change page
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
   
   return (
     <div className="container mx-auto px-4 py-8">
@@ -120,8 +148,8 @@ const Products = () => {
                 <li key={category} className="mb-1">
                   <a 
                     href={category === "All" ? "/products" : `/products?category=${category}`}
-                    className={`block py-1 hover:text-amazon-accent transition-colors ${
-                      activeCategory === category ? "text-amazon-accent font-medium" : ""
+                    className={`block py-1 hover:text-secondary transition-colors ${
+                      activeCategory === category ? "text-secondary font-medium" : ""
                     }`}
                   >
                     {category}
@@ -196,8 +224,8 @@ const Products = () => {
                     <li key={category}>
                       <a 
                         href={category === "All" ? "/products" : `/products?category=${category}`}
-                        className={`block py-1 hover:text-amazon-accent transition-colors ${
-                          activeCategory === category ? "text-amazon-accent font-medium" : ""
+                        className={`block py-1 hover:text-secondary transition-colors ${
+                          activeCategory === category ? "text-secondary font-medium" : ""
                         }`}
                         onClick={() => setIsFilterOpen(false)}
                       >
@@ -239,7 +267,7 @@ const Products = () => {
                         }}
                         className={`text-sm w-full py-1 px-2 rounded border ${
                           minRating === rating 
-                            ? "bg-amazon-accent text-white border-amazon-accent" 
+                            ? "bg-secondary text-white border-secondary" 
                             : "border-gray-300 hover:bg-gray-100"
                         }`}
                       >
@@ -272,7 +300,7 @@ const Products = () => {
           {/* Products grid */}
           {isLoading ? (
             <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amazon-accent"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="text-center py-12">
@@ -280,11 +308,67 @@ const Products = () => {
               <p className="text-gray-600">Try adjusting your filters or search query</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {currentProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+              
+              {totalPages > 1 && (
+                <Pagination className="mt-8">
+                  <PaginationContent>
+                    {currentPage > 1 && (
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => paginate(currentPage - 1)}
+                          className="cursor-pointer"
+                        />
+                      </PaginationItem>
+                    )}
+                    
+                    {Array.from({ length: totalPages }).map((_, index) => {
+                      const pageNumber = index + 1;
+                      // Show current page, first page, last page, and pages around current
+                      if (
+                        pageNumber === 1 ||
+                        pageNumber === totalPages ||
+                        (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                      ) {
+                        return (
+                          <PaginationItem key={pageNumber}>
+                            <PaginationLink 
+                              isActive={pageNumber === currentPage}
+                              onClick={() => paginate(pageNumber)}
+                              className="cursor-pointer"
+                            >
+                              {pageNumber}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      }
+                      // Show ellipsis for page gaps
+                      if (pageNumber === 2 && currentPage > 3) {
+                        return <PaginationItem key="ellipsis-start">...</PaginationItem>;
+                      }
+                      if (pageNumber === totalPages - 1 && currentPage < totalPages - 2) {
+                        return <PaginationItem key="ellipsis-end">...</PaginationItem>;
+                      }
+                      return null;
+                    })}
+                    
+                    {currentPage < totalPages && (
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => paginate(currentPage + 1)}
+                          className="cursor-pointer"
+                        />
+                      </PaginationItem>
+                    )}
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </>
           )}
         </div>
       </div>

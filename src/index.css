@@ -14,16 +14,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 215 33% 19%;  /* Amazon dark blue */
+    --primary: 215 33% 19%;  /* Dark blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 35 100% 50%;  /* Amazon orange */
+    --secondary: 35 100% 50%;  /* Orange */
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 35 100% 50%;  /* Amazon orange */
+    --accent: 35 100% 50%;  /* Orange */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -79,11 +79,11 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-amazon-accent hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded transition-colors;
+    @apply bg-secondary hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded transition-colors;
   }
   
   .btn-secondary {
-    @apply bg-amazon hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded transition-colors;
+    @apply bg-primary hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded transition-colors;
   }
   
   .product-card {

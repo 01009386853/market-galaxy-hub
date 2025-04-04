@@ -23,7 +23,7 @@ const Navbar = () => {
   };
   
   return (
-    <nav className="bg-amazon text-white">
+    <nav className="bg-primary text-white">
       <div className="container mx-auto px-4">
         {/* Main navbar */}
         <div className="flex items-center justify-between py-4">
@@ -47,7 +47,7 @@ const Navbar = () => {
               />
               <button 
                 type="submit" 
-                className="bg-amazon-accent p-2 rounded-r hover:bg-amber-600 transition-colors"
+                className="bg-secondary p-2 rounded-r hover:bg-amber-600 transition-colors"
               >
                 <Search size={20} />
               </button>
@@ -59,7 +59,7 @@ const Navbar = () => {
             <Link to="/cart" className="relative p-2 mr-4">
               <ShoppingCart size={24} />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-amazon-accent text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                <span className="absolute -top-1 -right-1 bg-secondary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
                   {totalItems}
                 </span>
               )}
@@ -87,7 +87,7 @@ const Navbar = () => {
             />
             <button 
               type="submit" 
-              className="bg-amazon-accent p-2 rounded-r hover:bg-amber-600 transition-colors"
+              className="bg-secondary p-2 rounded-r hover:bg-amber-600 transition-colors"
             >
               <Search size={20} />
             </button>
@@ -100,7 +100,7 @@ const Navbar = () => {
             <Link 
               key={category}
               to={category === "All" ? "/products" : `/products?category=${category}`}
-              className="text-sm whitespace-nowrap hover:text-amazon-accent transition-colors"
+              className="text-sm whitespace-nowrap hover:text-secondary transition-colors"
             >
               {category}
             </Link>
@@ -110,7 +110,7 @@ const Navbar = () => {
       
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-amazon-light text-amazon">
+        <div className="md:hidden bg-background text-foreground">
           <div className="container mx-auto px-4 py-3">
             <div className="flex flex-col">
               <h3 className="font-semibold mb-2">Categories</h3>
