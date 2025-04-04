@@ -5,6 +5,7 @@ import { Star, ChevronLeft, ChevronRight, Check, ShoppingCart, ArrowLeft } from 
 import { getProductById, getFeaturedProducts } from '../services/productService';
 import { Product, useCart } from '../contexts/CartContext';
 import ProductCard from '../components/ProductCard';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,7 @@ const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -71,11 +73,18 @@ const ProductDetail = () => {
       setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
     }
   };
+
+  const handleImageError = (index: number) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [index]: true
+    }));
+  };
   
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-24">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amazon-accent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -84,7 +93,7 @@ const ProductDetail = () => {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
         <h1 className="text-2xl font-bold mb-4">Product not found</h1>
-        <Link to="/products" className="text-amazon-accent hover:underline">
+        <Link to="/products" className="text-primary hover:underline">
           Back to products
         </Link>
       </div>
@@ -100,15 +109,15 @@ const ProductDetail = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
       <div className="flex items-center mb-6 text-sm">
-        <Link to="/" className="text-gray-500 hover:text-amazon-accent">Home</Link>
+        <Link to="/" className="text-gray-500 hover:text-primary">Home</Link>
         <span className="mx-2">/</span>
-        <Link to="/products" className="text-gray-500 hover:text-amazon-accent">Products</Link>
+        <Link to="/products" className="text-gray-500 hover:text-primary">Products</Link>
         <span className="mx-2">/</span>
         <span className="font-medium">{product.title}</span>
       </div>
       
       {/* Back button (mobile) */}
-      <Link to="/products" className="inline-flex items-center mb-4 text-amazon-accent md:hidden">
+      <Link to="/products" className="inline-flex items-center mb-4 text-primary md:hidden">
         <ArrowLeft size={16} className="mr-1" /> Back to products
       </Link>
       
@@ -116,12 +125,21 @@ const ProductDetail = () => {
       <div className="lg:flex gap-8">
         {/* Product images */}
         <div className="lg:w-1/2 mb-8 lg:mb-0">
-          <div className="relative bg-white rounded-lg overflow-hidden aspect-square mb-4">
-            <img 
-              src={product.images[selectedImage]} 
-              alt={product.title}
-              className="w-full h-full object-contain"
-            />
+          <div className="relative bg-white rounded-lg overflow-hidden mb-4">
+            <AspectRatio ratio={1/1}>
+              {!imageErrors[selectedImage] ? (
+                <img 
+                  src={product.images[selectedImage]} 
+                  alt={product.title}
+                  className="w-full h-full object-contain"
+                  onError={() => handleImageError(selectedImage)}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500 text-2xl font-bold">
+                  {product.title.charAt(0)}
+                </div>
+              )}
+            </AspectRatio>
             
             {product.images.length > 1 && (
               <>
@@ -157,14 +175,21 @@ const ProductDetail = () => {
                   key={index} 
                   onClick={() => setSelectedImage(index)}
                   className={`w-20 h-20 flex-shrink-0 rounded border-2 ${
-                    selectedImage === index ? 'border-amazon-accent' : 'border-transparent'
-                  }`}
+                    selectedImage === index ? 'border-primary' : 'border-transparent'
+                  } ${imageErrors[index] ? 'bg-gray-100' : ''}`}
                 >
-                  <img 
-                    src={img} 
-                    alt={`${product.title} - view ${index + 1}`}
-                    className="w-full h-full object-cover rounded"
-                  />
+                  {!imageErrors[index] ? (
+                    <img 
+                      src={img} 
+                      alt={`${product.title} - view ${index + 1}`}
+                      className="w-full h-full object-cover rounded"
+                      onError={() => handleImageError(index)}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
+                      {index + 1}
+                    </div>
+                  )}
                 </button>
               ))}
             </div>

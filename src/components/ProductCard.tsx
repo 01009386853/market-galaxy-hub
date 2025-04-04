@@ -1,27 +1,44 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { Product } from '../contexts/CartContext';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const [imageError, setImageError] = useState(false);
+  
   // Calculate discounted price if applicable
   const discountedPrice = product.discountPercentage
     ? product.price * (1 - product.discountPercentage / 100)
     : null;
     
+  // Handle image error
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <Link to={`/product/${product.id}`} className="overflow-hidden flex flex-col h-full bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-      <div className="relative pb-[56.25%]">
-        <img 
-          src={product.thumbnail} 
-          alt={product.title} 
-          className="absolute w-full h-full object-cover"
-        />
+      <div className="relative">
+        <AspectRatio ratio={16/9}>
+          {!imageError ? (
+            <img 
+              src={product.thumbnail} 
+              alt={product.title} 
+              className="w-full h-full object-cover"
+              onError={handleImageError}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
+              {product.title.charAt(0)}
+            </div>
+          )}
+        </AspectRatio>
         {product.discountPercentage && (
           <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
             {Math.round(product.discountPercentage)}% OFF
